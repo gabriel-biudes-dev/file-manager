@@ -1,6 +1,5 @@
 import os, hashlib
 from pathlib import Path
-path_atual = Path()
 
 #Get current absolute path
 def getCurrentPath():
@@ -51,14 +50,50 @@ def getBiggerStr(strlist):
         if len(x) > higher: higher = len(x)
     return higher
 
+def getBigger(pathlist):
+    higher = 0
+    for p in pathlist:
+        path = Path(p).absolute()
+        for x in getFiles(path, '', 2, 0):
+            if len(x) > higher: higher = len(x)
+    return higher
+
+def getFilesNumber(pathlist):
+    total = 0;
+    for p in pathlist:
+        path = Path(p).absolute()
+        for x in getFilesNew(path): total = total + 1
+    return total
+
+def getFilesNew(p):
+    flist = p.glob('**/*')
+    files = [x for x in flist if x.is_file()]
+    return files
+
+def getLog(pathlist):
+    f = open('data2.txt', 'w')
+    f.close()
+    #higher = getBiggerStr(getFiles(Path('/etc').absolute(), '', 2, 0))
+    #higher = getBigger(pathlist)
+    print('Calculating number of files..')
+    n = 1
+    filesNumber = getFilesNumber(pathlist)
+    f = open('data2.txt', 'a')
+    for p in pathlist:
+        path_atual = Path(p).absolute()
+        #for x in getFiles(path_atual, '', 2, 0):
+        for x in getFilesNew(path_atual):
+            f.write(str(x) + '\n')
+            #for y in range(higher - len(x) + 1): f.write(' ')
+            f.write(md5(x) + '\n\n')
+            #os.system('clear')
+            print(str(n) + '/' + str(filesNumber) + '  ' + str(path_atual))
+            n = n + 1
+    f.close()
+    print('Data logging completed')
+
 def main():
-    higher = getBiggerStr(getFiles(getCurrentPath(), '', 2, 0))
-    f = open('data.txt', 'w')
-    f.close()
-    f = open('data.txt', 'a')
-    for x in getFiles(getCurrentPath(), '', 2, 0):
-        f.write(x)
-        for y in range(higher - len(x) + 1): f.write(' ')
-        f.write(md5(x) + '\n')
-    f.close()
+    p = Path().absolute()
+    for x in getFilesNew(p):
+        print(os.stat(x), x)
 main()
